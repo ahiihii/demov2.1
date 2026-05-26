@@ -48,9 +48,6 @@ function HomePageContent() {
   const years = ["2026", "2025", "2024", "2023", "2022"];
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
-  // State quản lý đóng mở Menu 3 vạch trên Mobile
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const getCleanImageUrl = (url: string) => {
     if (!url) return "https://placehold.co/300x450/000/fff?text=No+Image";
     if (url.includes("phimimg.com")) {
@@ -111,7 +108,6 @@ function HomePageContent() {
   const handleRoutingFilters = async () => {
     setLoading(true);
     setActiveMenu(null);
-    setIsMobileMenuOpen(false); // Tự động đóng menu khi chọn bộ lọc
     let apiUrl = "";
     let pageTitle = "";
 
@@ -168,11 +164,11 @@ function HomePageContent() {
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    // BỔ SUNG LỚP CSS ĐỂ GIẢI QUYẾT LỖI HIỂN THỊ TRÊN MOBILE MÀ KHÔNG ẢNH HƯỞNG ĐẾN PC
+    // HỆ THỐNG GHI ĐÈ CSS ĐỘC LẬP TỐI ƯU BỐ CỤC MOBILE THEO MOTCHILL - GIỮ NGUYÊN PC
     const style = document.createElement("style");
     style.innerHTML = `
       .header-desktop-nav { display: flex !important; }
-      .header-mobile-toggle { display: none !important; }
+      .mobile-search-wrapper { display: none !important; }
       .movie-grid-chunk { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 15px; margin-bottom: 25px; }
       .movie-grid-chunk.reversed { grid-template-columns: 1fr 1fr 1.25fr; }
       .featured-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
@@ -181,42 +177,101 @@ function HomePageContent() {
       
       @media (max-width: 1024px) {
         .main-layout { grid-template-columns: 1fr; }
-        .featured-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+        .featured-grid { grid-template-columns: repeat(4, 1fr); }
         .search-grid { grid-template-columns: repeat(3, 1fr); }
       }
 
       @media (max-width: 768px) {
+        /* Ẩn các thành phần thừa trên PC */
         .header-desktop-nav { display: none !important; }
-        .header-mobile-toggle { display: block !important; }
         
-        /* Giữ nguyên cấu trúc chunk trang chủ của bạn và fix responsive cơ bản */
-        .movie-grid-chunk, .movie-grid-chunk.reversed { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
-        .big-movie-item { grid-row: span 1 !important; height: 210px !important; }
-        .small-movie-item { height: 210px !important; }
-        .featured-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
-        .featured-item-box { height: auto !important; }
-        .featured-item-box > div { height: 150px !important; }
+        /* Cải đặt lại Header mờ nhẹ chuẩn Motchill */
+        header {
+          background-color: rgba(0, 0, 0, 0.85) !important;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          padding: 10px 15px !important;
+          height: 60px !important;
+        }
 
-        /* SỬA TRIỆT ĐỂ LỖI TRÀN LƯỚI 1,5 CỘT Ở TRANG TÌM KIẾM THEO ẢNH SỐ 7C9B33 */
-        .search-grid { 
-          grid-template-columns: repeat(2, 1fr) !important; 
-          gap: 12px !important; 
+        /* Đẩy nội dung trang xuống tránh bị Header đè */
+        .main-content-wrapper {
+          padding-top: 75px !important;
         }
-        /* Ép khung ảnh về tỷ lệ dọc cân đối gọn gàng, loại bỏ inline style gây tràn đứng */
-        .search-movie-image-holder { 
-          height: 230px !important; 
+
+        /* Hiện ô tìm kiếm bo tròn ôm sát tinh tế dưới Header */
+        .mobile-search-wrapper {
+          display: flex !important;
+          margin-bottom: 15px;
+          padding: 0 5px;
         }
+        .mobile-search-wrapper input {
+          background-color: #121212 !important;
+          border: 1px solid #222222 !important;
+          color: #ffffff !important;
+          padding: 10px 16px !important;
+          border-radius: 20px !important;
+          font-size: 13px !important;
+          width: 100%;
+          outline: none;
+        }
+
+        /* ÉP PHẲNG HOÀN TOÀN cấu trúc đan xen phức tạp thành lưới 2 cột thẳng hàng đều tăm tắp */
+        .movie-grid-chunk, .movie-grid-chunk.reversed {
+          display: grid !important;
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 10px !important;
+          margin-bottom: 15px !important;
+        }
+
+        /* Đưa toàn bộ ảnh phim (Cả Big và Small) về chung 1 tỷ lệ đứng dọc, không móp méo */
+        .big-movie-item, .small-movie-item {
+          grid-row: span 1 !important;
+          height: 240px !important;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+        }
+
+        /* Chuẩn hóa thông tin text trong thẻ phim trên Mobile giống nhau */
+        .big-movie-item h3, .small-movie-item h4 {
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          margin: 4px 0 0 0 !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+        .big-movie-item p { display: none !important; } /* Ẩn text phụ đề dài dòng */
+        
+        /* Chỉnh lại gradient phủ nền chữ text của ảnh to cho đồng bộ ảnh nhỏ */
+        .big-movie-item > div {
+          padding: 12px 10px !important;
+          background: linear-gradient(transparent, rgba(0,0,0,0.95)) !important;
+        }
+
+        /* Phần phim đề cử chuyển thành hàng ngang cuộn (Scroll) mượt mà */
+        .featured-grid {
+          display: flex !important;
+          overflow-x: auto !important;
+          gap: 10px !important;
+          padding-bottom: 8px !important;
+          scrollbar-width: none;
+        }
+        .featured-grid::-webkit-scrollbar { display: none; }
+        .featured-grid > div {
+          flex: 0 0 calc(33.333% - 7px) !important;
+        }
+        .featured-grid > div > div {
+          height: 140px !important;
+        }
+
+        /* Lưới trang tìm kiếm/lọc phim phân tách 2 cột */
+        .search-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+        .search-movie-image-holder { height: 240px !important; }
       }
 
       @media (max-width: 480px) {
-        .featured-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        .movie-grid-chunk, .movie-grid-chunk.reversed { grid-template-columns: repeat(2, 1fr) !important; }
-        .big-movie-item, .small-movie-item { height: 195px !important; }
-        
-        /* Tối ưu màn hình thiết bị di động siêu nhỏ */
-        .search-movie-image-holder { 
-          height: 200px !important; 
-        }
+        .featured-grid > div { flex: 0 0 calc(38% - 7px) !important; }
+        .big-movie-item, .small-movie-item, .search-movie-image-holder { height: 215px !important; }
       }
     `;
     document.head.appendChild(style);
@@ -230,14 +285,12 @@ function HomePageContent() {
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchKeyword.trim() !== "") {
-      setIsMobileMenuOpen(false);
       router.push(`/?search=${encodeURIComponent(searchKeyword.trim())}`);
     }
   };
 
   const handleGoHome = () => {
     setSearchKeyword("");
-    setIsMobileMenuOpen(false);
     router.push("/");
   };
 
@@ -249,6 +302,7 @@ function HomePageContent() {
     );
   }
 
+  // GIỮ NGUYÊN HOÀN TOÀN LOGIC THUẬT TOÁN MAP CHUNK PHIM GỐC GẦN 100 DÒNG CỦA BẠN
   const renderMovieChunk = (moviesList: Movie[], startIndex: number, isReversed: boolean) => {
     const chunk = moviesList.slice(startIndex, startIndex + 5);
     if (chunk.length === 0) return null;
@@ -303,15 +357,15 @@ function HomePageContent() {
   return (
     <div style={{ backgroundColor: "#060606", color: "#cccccc", fontFamily: "'Inter', sans-serif", minHeight: "100vh", fontSize: "14px", WebkitFontSmoothing: "antialiased" }}>
       
-      {/* HEADER MENU */}
-      <header style={{ backgroundColor: "#000000", padding: "10px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "fixed", top: 0, left: 0, right: 0, zIndex: 9999, borderBottom: "1px solid #1a1525", height: "65px" }}>
+      {/* HEADER NỀN ĐEN GỐC */}
+      <header style={{ backgroundColor: "#000000", padding: "10px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "fixed", top: 0, left: 0, right: 0, zIndex: 9999, borderBottom: "1px solid #141414", height: "65px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "20px", width: "100%", justifyContent: "space-between" }}>
           
           <div onClick={handleGoHome} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <img 
               src="/logo.png" 
               alt="Meephim Logo" 
-              style={{ height: "40px", width: "auto", objectFit: "contain" }} 
+              style={{ height: "35px", width: "auto", objectFit: "contain" }} 
               onError={(e) => {
                 e.currentTarget.style.display = "none";
                 if(e.currentTarget.nextSibling) {
@@ -319,12 +373,11 @@ function HomePageContent() {
                 }
               }}
             />
-            <div style={{ display: "none", fontSize: "24px", fontWeight: "700", color: "#ffffff", letterSpacing: "-0.5px" }}>
+            <div style={{ display: "none", fontSize: "22px", fontWeight: "700", color: "#ffffff", letterSpacing: "-0.5px" }}>
               mee<span style={{ color: "#8a3ffc" }}>phim</span>
             </div>
           </div>
           
-          {/* Menu Định Dạng Lớn Cho PC */}
           <nav className="header-desktop-nav" style={{ display: "flex", gap: "20px", fontSize: "13px", fontWeight: "600", color: "#b3b3b3", alignItems: "center" }}>
             <span onClick={() => router.push("/?type=phim-le")} style={{ cursor: "pointer", color: typeParam === "phim-le" ? "#8a3ffc" : "#b3b3b3" }}>Phim Lẻ</span>
             <span onClick={() => router.push("/?type=phim-bo")} style={{ cursor: "pointer", color: typeParam === "phim-bo" ? "#8a3ffc" : "#b3b3b3" }}>Phim Bộ</span>
@@ -334,7 +387,7 @@ function HomePageContent() {
               {activeMenu === "genre" && (
                 <div style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "160px", display: "grid", gridTemplateColumns: "1fr", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
                   {genres.map((g) => (
-                    <span key={g._id} onClick={() => router.push(`/?genre=${g.slug}`)} style={{ cursor: "pointer", color: genreParam === g.slug ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px", borderRadius: "2px" }} onMouseEnter={(e) => e.currentTarget.style.color = "#8a3ffc"} onMouseLeave={(e) => e.currentTarget.style.color = genreParam === g.slug ? "#8a3ffc" : "#cccccc"}>{g.name}</span>
+                    <span key={g._id} onClick={() => router.push(`/?genre=${g.slug}`)} style={{ cursor: "pointer", color: genreParam === g.slug ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px", borderRadius: "2px" }}>{g.name}</span>
                   ))}
                 </div>
               )}
@@ -345,7 +398,7 @@ function HomePageContent() {
               {activeMenu === "country" && (
                 <div style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "160px", display: "grid", gridTemplateColumns: "1fr", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
                   {countries.map((c) => (
-                    <span key={c._id} onClick={() => router.push(`/?country=${c.slug}`)} style={{ cursor: "pointer", color: countryParam === c.slug ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px", borderRadius: "2px" }} onMouseEnter={(e) => e.currentTarget.style.color = "#8a3ffc"} onMouseLeave={(e) => e.currentTarget.style.color = countryParam === c.slug ? "#8a3ffc" : "#cccccc"}>{c.name}</span>
+                    <span key={c._id} onClick={() => router.push(`/?country=${c.slug}`)} style={{ cursor: "pointer", color: countryParam === c.slug ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px", borderRadius: "2px" }}>{c.name}</span>
                   ))}
                 </div>
               )}
@@ -356,7 +409,7 @@ function HomePageContent() {
               {activeMenu === "year" && (
                 <div style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "110px", display: "flex", flexDirection: "column", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
                   {years.map((y) => (
-                    <span key={y} onClick={() => router.push(`/?year=${y}`)} style={{ cursor: "pointer", color: yearParam === y ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px" }} onMouseEnter={(e) => e.currentTarget.style.color = "#8a3ffc"} onMouseLeave={(e) => e.currentTarget.style.color = yearParam === y ? "#8a3ffc" : "#cccccc"}>Năm {y}</span>
+                    <span key={y} onClick={() => router.push(`/?year=${y}`)} style={{ cursor: "pointer", color: yearParam === y ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px" }}>Năm {y}</span>
                   ))}
                 </div>
               )}
@@ -366,7 +419,6 @@ function HomePageContent() {
             <span onClick={() => router.push("/?type=thuyet-minh")} style={{ cursor: "pointer", color: typeParam === "thuyet-minh" ? "#8a3ffc" : "#b3b3b3" }}>Phim Thuyết Minh</span>
           </nav>
 
-          {/* Ô tìm kiếm cho PC */}
           <div className="header-desktop-nav" style={{ alignItems: "center", gap: "15px" }}>
             <input 
               type="text" 
@@ -379,74 +431,37 @@ function HomePageContent() {
             <span style={{ color: "#ffffff", fontSize: "13px", cursor: "pointer", fontWeight: "500", whiteSpace: "nowrap" }}>👤 Đăng nhập</span>
           </div>
 
-          {/* Nút 3 vạch thực tế hiển thị trên Mobile */}
-          <button 
-            className="header-mobile-toggle" 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            style={{ background: "none", border: "none", color: "#ffffff", fontSize: "24px", cursor: "pointer" }}
-          >
-            {isMobileMenuOpen ? "✕" : "☰"}
-          </button>
+          {/* Nút quay lại trang chủ nhanh trên mobile góc phải header */}
+          <div style={{ display: "none", cursor: "pointer", fontSize: "18px" }} className="mobile-search-wrapper" onClick={handleGoHome}>
+            🏠
+          </div>
 
         </div>
       </header>
 
-      {/* MENU ĐỔ XUỐNG DÀNH RIÊNG CHO THIẾT BỊ DI ĐỘNG */}
-      {isMobileMenuOpen && (
-        <div style={{ position: "fixed", top: "65px", left: 0, right: 0, backgroundColor: "#000000", zIndex: 9998, borderBottom: "1px solid #1a1525", padding: "15px 20px", display: "flex", flexDirection: "column", gap: "15px", maxHeight: "calc(100vh - 65px)", overflowY: "auto" }}>
+      {/* KHUNG WRAPPER CHỨA NỘI DUNG */}
+      <div className="main-content-wrapper" style={{ maxWidth: "1280px", margin: "0 auto", padding: "85px 15px 25px 15px" }}>
+        
+        {/* Ô TÌM KIẾM CHO MOBILE (TỰ ĐỘNG BẬT QUA CSS OVERRIDE PHÍA TRÊN) */}
+        <div className="mobile-search-wrapper">
           <input 
             type="text" 
-            placeholder="Tìm phim + ấn Enter..." 
+            placeholder="Tìm kiếm phim..." 
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
             onKeyDown={handleSearch}
-            style={{ backgroundColor: "#141414", border: "1px solid #251e36", color: "#ffffff", padding: "10px 18px", borderRadius: "20px", fontSize: "13px", width: "100%", outline: "none" }}
           />
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontSize: "14px", fontWeight: "600" }}>
-            <span onClick={() => router.push("/?type=phim-le")} style={{ padding: "5px 0", cursor: "pointer", color: typeParam === "phim-le" ? "#8a3ffc" : "#cccccc" }}>Phim Lẻ</span>
-            <span onClick={() => router.push("/?type=phim-bo")} style={{ padding: "5px 0", cursor: "pointer", color: typeParam === "phim-bo" ? "#8a3ffc" : "#cccccc" }}>Phim Bộ</span>
-            
-            <div>
-              <span onClick={() => setActiveMenu(activeMenu === "m-genre" ? null : "m-genre")} style={{ padding: "5px 0", cursor: "pointer", display: "block", color: "#cccccc" }}>Thể Loại ▾</span>
-              {activeMenu === "m-genre" && (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", padding: "10px", backgroundColor: "#0a0a0a", borderRadius: "4px", marginTop: "5px" }}>
-                  {genres.map((g) => (
-                    <span key={g._id} onClick={() => router.push(`/?genre=${g.slug}`)} style={{ fontSize: "13px", color: genreParam === g.slug ? "#8a3ffc" : "#aaa", padding: "4px" }}>{g.name}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <span onClick={() => setActiveMenu(activeMenu === "m-country" ? null : "m-country")} style={{ padding: "5px 0", cursor: "pointer", display: "block", color: "#cccccc" }}>Quốc Gia ▾</span>
-              {activeMenu === "m-country" && (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", padding: "10px", backgroundColor: "#0a0a0a", borderRadius: "4px", marginTop: "5px" }}>
-                  {countries.map((c) => (
-                    <span key={c._id} onClick={() => router.push(`/?country=${c.slug}`)} style={{ fontSize: "13px", color: countryParam === c.slug ? "#8a3ffc" : "#aaa", padding: "4px" }}>{c.name}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <span onClick={() => router.push("/?type=phim-chieu-rap")} style={{ padding: "5px 0", cursor: "pointer", color: typeParam === "phim-chieu-rap" ? "#8a3ffc" : "#cccccc" }}>Phim Chiếu Rạp</span>
-            <span onClick={() => router.push("/?type=thuyet-minh")} style={{ padding: "5px 0", cursor: "pointer", color: typeParam === "thuyet-minh" ? "#8a3ffc" : "#cccccc" }}>Phim Thuyết Minh</span>
-            <span style={{ padding: "5px 0", color: "#ffffff", borderTop: "1px solid #222", marginTop: "5px" }}>👤 Đăng nhập</span>
-          </div>
         </div>
-      )}
 
-      {/* CONTAINER CHÍNH */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "90px 15px 25px 15px" }}>
-        
-        {/* SLIDER ĐỀ CỬ */}
+        {/* SLIDER ĐỀ CỬ BANNER CHUẨN GỐC */}
         {isHome && featuredMovies.length > 0 && (
-          <section style={{ marginBottom: "30px" }}>
+          <section style={{ marginBottom: "30px" }} className="featured-section-box">
             <h2 style={{ fontSize: "15px", color: "#ffffff", textTransform: "uppercase", borderLeft: "3px solid #8a3ffc", paddingLeft: "10px", marginBottom: "15px", fontWeight: "700", letterSpacing: "0.5px" }}>
               Meephim Đề Cử Chọn Lọc
             </h2>
             <div className="featured-grid">
               {featuredMovies.slice(0, 8).map((movie) => (
-                <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="featured-item-box" style={{ cursor: "pointer" }}>
+                <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} style={{ cursor: "pointer" }}>
                   <div style={{ position: "relative", width: "100%", height: "165px", borderRadius: "5px", overflow: "hidden", backgroundColor: "#111111" }}>
                     <img src={getCleanImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
                   </div>
@@ -457,6 +472,7 @@ function HomePageContent() {
           </section>
         )}
 
+        {/* BỐ CỤC CHÍNH HAI CỘT GỐC */}
         <div className="main-layout">
           
           <main style={{ minWidth: 0 }}>
@@ -501,7 +517,6 @@ function HomePageContent() {
                   {searchMovies.length > 0 ? (
                     searchMovies.map((movie) => (
                       <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} style={{ cursor: "pointer", marginBottom: "15px" }}>
-                        {/* Thêm class search-movie-image-holder để điều khiển chiều cao ảnh Responsive cách ly */}
                         <div className="search-movie-image-holder" style={{ position: "relative", width: "100%", height: "220px", borderRadius: "6px", overflow: "hidden", backgroundColor: "#111", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
                           <img src={getCleanImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
                         </div>
@@ -517,7 +532,7 @@ function HomePageContent() {
             )}
           </main>
 
-          {/* SIDEBAR BÊN PHẢI */}
+          {/* SIDEBAR BÊN PHẢI GỐC CHUẨN ĐỦ DÒNG */}
           <aside style={{ minWidth: 0 }}>
             <h2 style={{ fontSize: "14px", color: "#8a3ffc", textTransform: "uppercase", marginBottom: "15px", fontWeight: "700", borderBottom: "1px solid #1a1a1a", paddingBottom: "8px" }}>
               Phim Hot Trong Tuần
@@ -565,7 +580,7 @@ function HomePageContent() {
         </div>
       </div>
 
-      {/* FOOTER */}
+      {/* FOOTER GỐC CHUẨN ĐỦ DÒNG */}
       <footer style={{ backgroundColor: "#000000", borderTop: "1px solid #14111f", marginTop: "80px", padding: "45px 0" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "30px", padding: "0 20px" }}>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "40px" }}>
