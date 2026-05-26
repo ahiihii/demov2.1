@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #080b12;
+  --card: #111827;
+  --card2: #161f2d;
+  --text: #ffffff;
+  --muted: #9ca3af;
+  --accent: #ffb400;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+body {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,.4),
+      rgba(0,0,0,.9)
+    ),
+    #080b12;
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffb400;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111827;
+}
+
+/* IMAGE */
+
+img {
+  user-select: none;
+}
+
+/* LINK */
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* HOVER EFFECT */
+
+.movie-card {
+  transition: all .3s ease;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+}
+
+/* GLOW */
+
+.glow {
+  box-shadow:
+    0 0 20px rgba(255,180,0,.15);
+}
+
+/* OVERLAY */
+
+.overlay {
+  background:
+    linear-gradient(
+      to top,
+      rgba(0,0,0,.95),
+      rgba(0,0,0,.4),
+      transparent
+    );
+}
