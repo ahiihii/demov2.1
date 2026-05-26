@@ -47,15 +47,20 @@ function HomePageContent() {
   const years = ["2026", "2025", "2024", "2023", "2022"];
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
+  // FIX CHÍ MẠNG 1: Hàm xử lý ảnh thông minh cho mọi endpoint API
   const getCleanImageUrl = (url: string) => {
     if (!url) return "https://placehold.co/300x450/000/fff?text=No+Image";
-    if (url.includes("phimimg.com")) {
-      return url.replace("https://phimimg.com", "https://img.phimapi.com")
-                .replace("http://phimimg.com", "https://img.phimapi.com");
-    }
+    
+    // Nếu API trả về đường dẫn đầy đủ dạng http/https
     if (url.startsWith("http://") || url.startsWith("https://")) {
+      if (url.includes("phimimg.com")) {
+        return url.replace("https://phimimg.com", "https://img.phimapi.com")
+                  .replace("http://phimimg.com", "https://img.phimapi.com");
+      }
       return url;
     }
+    
+    // Nếu chỉ là đuôi ảnh (thường gặp ở endpoint /v1/api)
     return `https://img.phimapi.com/${url}`;
   };
 
@@ -177,8 +182,6 @@ function HomePageContent() {
       .movie-grid-chunk.reversed { grid-template-columns: 1fr 1fr 1.25fr; }
       .featured-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
       .main-layout { display: grid; grid-template-columns: 1fr 310px; gap: 30px; }
-      
-      /* Cấu trúc Grid cho trang Tìm kiếm / Nút bấm */
       .search-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
       
       @media (max-width: 1024px) {
@@ -230,7 +233,6 @@ function HomePageContent() {
           height: auto !important; 
         }
 
-        /* Responsive Mobile cho trang Lọc/Tìm kiếm */
         .search-grid { 
           display: grid !important;
           grid-template-columns: repeat(2, 1fr) !important; 
@@ -492,13 +494,16 @@ function HomePageContent() {
                     searchMovies.map((movie) => (
                       <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} style={{ cursor: "pointer", marginBottom: "15px" }}>
                         
-                        {/* CHỖ FIX CHÍ MẠNG: Bọc khung cố định tỷ lệ aspect-ratio 2/3 */}
-                        <div style={{ position: "relative", width: "100%", aspectRatio: "2 / 3", borderRadius: "6px", overflow: "hidden", backgroundColor: "#111", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
+                        {/* FIX CHÍ MẠNG 2: Khóa chặt chiều cao bằng padding-top tỉ lệ 150% thay vì aspect-ratio đề phòng ảnh lỗi trình duyệt bị sập layout */}
+                        <div style={{ position: "relative", width: "100%", paddingTop: "150%", borderRadius: "6px", overflow: "hidden", backgroundColor: "#141414", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
                           <img 
                             src={getCleanImageUrl(movie.poster_url || movie.thumb_url)} 
                             alt={movie.name} 
-                            /* Khóa chiều cao 100% bằng absolute bao khít div bọc để triệt tiêu lỗi phình ảnh trên Vercel */
-                            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} 
+                            /* Sử dụng onError dự phòng nếu link chết thì đổi sang ảnh nền đen chữ trắng, tránh nát giao diện */
+                            onError={(e) => {
+                              e.currentTarget.src = "https://placehold.co/300x450/141414/ffffff?text=Meephim";
+                            }}
+                            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} 
                             loading="lazy" 
                           />
                         </div>
@@ -547,7 +552,7 @@ function HomePageContent() {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", minWidth: 0 }}>
                     <h4 style={{ fontSize: "13px", color: "#ffffff", margin: "0 0 4px 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: "700" }}>{movie.name}</h4>
-                    <p style={{ fontSize: "13px", color: "#aaaaaa", margin: "0 0 5px 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{movie.origin_name}</p>
+                    <p style={{ fontSize: "13px", color: "#aaaaaa", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{movie.origin_name}</p>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#cccccc" }}>
                       <span style={{ color: "#8a3ffc", fontWeight: "700" }}>⭐ {(9.5 - (index * 0.1)).toFixed(1)}</span>
                       <span>•</span>
