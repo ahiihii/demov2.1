@@ -1,237 +1,121 @@
-@import "tailwindcss";
-
-:root {
-  --bg: #080b12;
-  --card: #111827;
-  --card2: #161f2d;
-  --text: #ffffff;
-  --muted: #9ca3af;
-  --accent: #ffb400;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html,
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
-}
-
-body {
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0,0,0,.4),
-      rgba(0,0,0,.9)
-    ),
-    #080b12;
-}
-
-/* SCROLLBAR */
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #ffb400;
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-track {
-  background: #111827;
-}
-
-/* IMAGE */
-
-img {
-  user-select: none;
-}
-
-/* LINK */
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-/* HOVER EFFECT */
-
-.movie-card {
-  transition: all .3s ease;
-}
-
-.movie-card:hover {
-  transform: scale(1.05);
-}
-
-/* GLOW */
-
-.glow {
-  box-shadow:
-    0 0 20px rgba(255,180,0,.15);
-}
-
-/* OVERLAY */
-
-.overlay {
-  background:
-    linear-gradient(
-      to top,
-      rgba(0,0,0,.95),
-      rgba(0,0,0,.4),
-      transparent
-    );
-}
 /* =======================================================
-   CSS RESPONSIVE FIX GIAO DIỆN MOBILE (MÔ PHỎNG MOTCHILL)
+   CSS RESPONSIVE UPDATE - PHONG CÁCH MOTCHILL DI ĐỘNG
    ======================================================= */
 @media screen and (max-width: 768px) {
-  /* Hủy hiệu ứng zoom lỗi trên mobile */
-  .app-main-wrapper {
-    zoom: 1 !important;
+  /* 1. HIỂN THỊ NÚT 3 GẠCH VÀ ẨN MENU NGANG TRÀN VIỀN */
+  .mobile-hamburger-btn {
+    display: block !important;
   }
 
-  /* 1. FIX HEADER & MENU CUỘN NGANG GIỐNG MOTCHILL */
-  .main-header {
-    padding: 8px 12px !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    height: auto !important;
-  }
-
-  .main-header img {
-    height: 40px !important; /* Giảm size logo */
-  }
-
-  /* Biến thanh điều hướng thành thanh trượt ngang mượt mà */
+  /* Biến đổi thanh nav thành Menu dọc thả xuống chỉ hiện khi click 3 gạch */
   .nav-menu {
-    position: fixed !important;
-    top: 56px !important;
+    display: none !important; /* Mặc định ẩn trên mobile */
+    position: absolute !important;
+    top: 60px !important;
     left: 0 !important;
     right: 0 !important;
-    background: #000000 !important;
-    padding: 10px 15px !important;
-    gap: 16px !important;
-    overflow-x: auto !important;
+    background-color: #0b0b0b !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    padding: 10px 0 !important;
+    border-bottom: 2px solid #1a1525 !important;
+    z-index: 99999 !important;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.9) !important;
+  }
+
+  /* Khi class .mobile-open được kích hoạt qua State React */
+  .nav-menu.mobile-open {
     display: flex !important;
-    flex-direction: row !important;
-    border-bottom: 1px solid #1a1525 !important;
-    white-space: nowrap !important;
-    z-index: 9998 !important;
   }
 
-  /* Ẩn thanh cuộn mặc định của trình duyệt để nhìn gọn hơn */
-  .nav-menu::-webkit-scrollbar {
-    display: none !important;
+  /* Căn chỉnh lại các nút trong menu 3 gạch cho đẹp */
+  .nav-menu > span, 
+  .nav-menu > div {
+    width: 100% !important;
+    padding: 14px 20px !important;
+    border-bottom: 1px solid #141414 !important;
+    box-sizing: border-box !important;
+    font-size: 14px !important;
   }
 
-  /* Thu nhỏ ô tìm kiếm và ẩn chữ Đăng nhập dài */
-  .header-right-box {
-    gap: 8px !important;
+  /* Submenu con (Thể loại, quốc gia) trải dài tinh tế */
+  .dropdown-sub-menu {
+    position: relative !important;
+    top: 5px !important;
+    width: 100% !important;
+    border: none !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* Chia 2 cột dọc dễ bấm */
+    box-shadow: none !important;
+    background: #111111 !important;
+    padding: 10px !important;
   }
 
+  /* Fix lại Header nhỏ gọn chuẩn mobile */
+  .main-header {
+    padding: 10px 15px !important;
+  }
+  .main-header img {
+    height: 38px !important;
+  }
   .header-right-box input {
-    width: 120px !important;
+    width: 110px !important;
     padding: 6px 12px !important;
-    font-size: 11px !important;
   }
-
   .login-btn {
-    font-size: 11px !important;
-    white-space: nowrap !important;
+    display: none !important; /* Ẩn chữ đăng nhập để nhường chỗ ô tìm kiếm */
   }
 
-  /* 2. FIX CONTAINER CHÍNH TRANG WEB */
+  /* Đẩy nội dung chính xuống vừa đủ */
   .main-content-layout {
-    padding: 115px 10px 20px 10px !important; /* Đẩy nội dung xuống tránh đè menu */
+    padding: 80px 12px 20px 12px !important;
   }
 
-  /* 3. FIX GRID ĐỀ CỬ ĐẦU TRANG CHUYỂN THÀNH 3 CỘT */
+  /* 2. FIX ẢNH ĐỀ CỬ BỊ MẤT 1 PHẦN (LỖI CẮT ẢNH) */
   .featured-movies-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(3, 1fr) !important; /* Tăng từ 2 lên 3 cột nhìn mượt như Motchill */
     gap: 8px !important;
   }
 
   .featured-movie-card {
-    height: 140px !important;
+    height: 155px !important; /* Tăng nhẹ chiều cao để vừa khít tỷ lệ poster gốc */
+    border: 1px solid #1a1a1a !important;
   }
 
-  /* 4. CHUYỂN BỐ CỤC PC SANG DẠNG HÀNG DỌC MOBILE */
+  .featured-movie-card img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important; /* Ép ảnh co giãn theo chuẩn khung hình, KHÔNG bị cắt mất góc */
+  }
+
+  /* 3. ĐỒNG BỘ LƯỚI DANH SÁCH PHIM THƯỜNG */
   .split-desktop-layout {
     grid-template-columns: 1fr !important;
-    gap: 25px !important;
   }
 
-  /* 5. PHÁ BỐ CỤC CHUNK VÀ ĐƯA VỀ LƯỚI 2 CỘT POSTER ĐỀU NHAU (GIỐNG MOTCHILL) */
   .movie-chunk-container {
-    grid-template-columns: repeat(2, 1fr) !important; /* Chia đều 2 cột poster */
-    gap: 10px !important;
-  }
-
-  /* Ép tất cả thẻ phim lớn và nhỏ về cùng 1 size đồng bộ */
-  .movie-chunk-container .movie-card-big,
-  .movie-chunk-container .movie-card-small {
-    grid-row: span 1 !important;
-    height: 220px !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-
-  .movie-chunk-container img {
-    height: 170px !important;
-    width: 100% !important;
-    object-fit: cover !important; /* Chống méo hình ảnh */
-  }
-
-  /* Custom lại thanh text tiêu đề dưới ảnh phim */
-  .movie-chunk-container .movie-card-title-box,
-  .movie-chunk-container div[style*="background: \"linear-gradient(to top, rgba(0,0,0,1) 0%"] {
-    position: relative !important;
-    background: none !important;
-    padding: 6px 0 0 0 !important;
-  }
-
-  .movie-chunk-container h3.big-movie-title,
-  .movie-chunk-container h4 {
-    font-size: 12px !important;
-    color: #ffffff !important;
-    margin: 0 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    font-weight: 600 !important;
-  }
-
-  /* Ẩn tên gốc Tiếng Anh để tránh chật giao diện Mobile */
-  .movie-origin-name {
-    display: none !important;
-  }
-
-  /* 6. LƯỚI PHIM THEO DANH MỤC LỌC/TÌM KIẾM (Chuyển từ 4 sang 2 cột) */
-  .category-movies-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px !important;
   }
 
-  .category-movie-card {
-    height: 200px !important;
+  .movie-chunk-container .movie-card-big,
+  .movie-chunk-container .movie-card-small {
+    grid-row: span 1 !important;
+    height: 230px !important; /* Đảm bảo đủ khoảng chứa ảnh */
   }
 
-  /* 7. ĐIỀU CHỈNH SIDEBAR PHIM HOT VÀ FOOTER XUỐNG DƯỚI */
-  .sidebar-hot-content {
-    margin-top: 15px !important;
+  .movie-chunk-container img {
+    height: 180px !important;
+    object-fit: fill !important; /* Đổi sang fill giúp hiển thị trọn vẹn poster phim */
   }
 
-  .footer-container {
-    grid-template-columns: 1fr !important; /* Chuyển footer thành dạng dọc dọc */
-    gap: 30px !important;
-    padding: 0 15px !important;
+  .movie-chunk-container .movie-card-title-box,
+  div[style*="background: \"linear-gradient(to top, rgba(0,0,0,1) 0%"] {
+    position: relative !important;
+    background: none !important;
+    padding: 5px 0 0 0 !important;
+  }
+
+  .movie-origin-name {
+    display: none !important;
   }
 }
