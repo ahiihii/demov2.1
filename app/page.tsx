@@ -24,7 +24,6 @@ function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // Lấy các tham số từ URL query
   const typeParam = searchParams.get("type");
   const genreParam = searchParams.get("genre");
   const countryParam = searchParams.get("country");
@@ -60,7 +59,6 @@ function HomePageContent() {
     return `https://img.phimapi.com/${url}`;
   };
 
-  // Hàm điều hướng chung - Reset sạch dữ liệu cũ tránh lỗi kẹt giao diện khi bấm nút
   const handleMenuClick = (url: string) => {
     setLoading(true);
     setSearchMovies([]);
@@ -171,7 +169,7 @@ function HomePageContent() {
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    // HỆ THỐNG GHI ĐÈ CSS ĐỘC LẬP - BẤT CHẤP MỌI LOẠI THIẾT BỊ VÀ NÚT BẤM
+    // BỔ SUNG CSS MEDIA QUERIES TĨNH ĐỂ KHÔNG BỊ DELAY KHI SERVER RENDER TRÊN VERCEL
     const style = document.createElement("style");
     style.innerHTML = `
       .header-desktop-nav { display: flex !important; }
@@ -219,7 +217,6 @@ function HomePageContent() {
           outline: none;
         }
 
-        /* TRANG CHỦ: ÉP PHẲNG LƯỚI 2 CỘT */
         .movie-grid-chunk, .movie-grid-chunk.reversed {
           display: grid !important;
           grid-template-columns: repeat(2, 1fr) !important;
@@ -227,7 +224,6 @@ function HomePageContent() {
           margin-bottom: 15px !important;
         }
 
-        /* KHÓA CHẾT TỶ LỆ BANNER KHUNG POSTER TRANG CHỦ */
         .big-movie-item, .small-movie-item {
           grid-row: span 1 !important;
           height: auto !important; 
@@ -254,42 +250,12 @@ function HomePageContent() {
           background: linear-gradient(transparent, rgba(0,0,0,0.95)) !important;
         }
 
-        /* SỬA TRIỆT ĐỂ: TRANG TÌM KIẾM & PHIM LẺ / THỂ LOẠI / QUỐC GIA */
         .search-grid { 
           display: grid !important;
           grid-template-columns: repeat(2, 1fr) !important; 
           gap: 12px !important; 
         }
-        
-        .search-movie-image-holder { 
-          height: auto !important; 
-          aspect-ratio: 2 / 3 !important; 
-          width: 100% !important;
-        }
-        
-        .search-movie-image-holder img {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: cover !important;
-        }
 
-        .search-grid h3 {
-          font-size: 12px !important;
-          font-weight: 600 !important;
-          margin: 6px 0 2px 0 !important;
-          white-space: nowrap !important;
-          overflow: hidden !important;
-          text-overflow: ellipsis !important;
-        }
-        .search-grid p {
-          font-size: 11px !important;
-          margin: 0 !important;
-          white-space: nowrap !important;
-          overflow: hidden !important;
-          text-overflow: ellipsis !important;
-        }
-
-        /* Slider đề cử hàng ngang cuộn tròn trịa */
         .featured-grid {
           display: flex !important;
           overflow-x: auto !important;
@@ -339,7 +305,6 @@ function HomePageContent() {
     );
   }
 
-  // RENDER TRANG CHỦ (MAPPED CHUNK)
   const renderMovieChunk = (moviesList: Movie[], startIndex: number, isReversed: boolean) => {
     const chunk = moviesList.slice(startIndex, startIndex + 5);
     if (chunk.length === 0) return null;
@@ -394,7 +359,6 @@ function HomePageContent() {
   return (
     <div style={{ backgroundColor: "#060606", color: "#cccccc", fontFamily: "'Inter', sans-serif", minHeight: "100vh", fontSize: "14px", WebkitFontSmoothing: "antialiased" }}>
       
-      {/* HEADER NAVBAR ĐÃ SỬA HẾT CÁC NÚT BẤM CHUYỂN TAB */}
       <header style={{ backgroundColor: "#000000", padding: "10px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "fixed", top: 0, left: 0, right: 0, zIndex: 9999, borderBottom: "1px solid #141414", height: "65px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "20px", width: "100%", justifyContent: "space-between" }}>
           
@@ -475,10 +439,8 @@ function HomePageContent() {
         </div>
       </header>
 
-      {/* KHUNG WRAPPER CHỨA NỘI DUNG CHÍNH */}
       <div className="main-content-wrapper" style={{ maxWidth: "1280px", margin: "0 auto", padding: "85px 15px 25px 15px" }}>
         
-        {/* THANH TÌM KIẾM CHO MOBILE */}
         <div className="mobile-search-wrapper">
           <input 
             type="text" 
@@ -489,7 +451,6 @@ function HomePageContent() {
           />
         </div>
 
-        {/* BANNER ĐỀ CỬ */}
         {isHome && featuredMovies.length > 0 && (
           <section style={{ marginBottom: "30px" }} className="featured-section-box">
             <h2 style={{ fontSize: "15px", color: "#ffffff", textTransform: "uppercase", borderLeft: "3px solid #8a3ffc", paddingLeft: "10px", marginBottom: "15px", fontWeight: "700", letterSpacing: "0.5px" }}>
@@ -508,7 +469,6 @@ function HomePageContent() {
           </section>
         )}
 
-        {/* HAI CỘT PHIM */}
         <div className="main-layout">
           
           <main style={{ minWidth: 0 }}>
@@ -550,22 +510,23 @@ function HomePageContent() {
                   <span onClick={handleGoHome} style={{ color: "#8a3ffc", fontSize: "12px", cursor: "pointer", fontWeight: "700" }}>← Quay lại</span>
                 </div>
                 
-                {/* LƯỚI KẾT QUẢ TÌM KIẾM / BỘ LỌC ĐÃ PHẲNG TUYỆT ĐỐI */}
                 <div className="search-grid">
                   {searchMovies.length > 0 ? (
                     searchMovies.map((movie) => (
                       <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} style={{ cursor: "pointer", marginBottom: "15px" }}>
                         
-                        <div className="search-movie-image-holder">
+                        {/* SỬA CHÍ CHÓC: KHÓA TRỰC TIẾP STYLE TẠI ĐÂY ĐỂ TRÁNH LỖI SSR KHI DEPLOY VERCEL */}
+                        <div style={{ position: "relative", width: "100%", height: "auto", aspectRatio: "2 / 3", borderRadius: "6px", overflow: "hidden", backgroundColor: "#111", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
                           <img 
                             src={getCleanImageUrl(movie.poster_url || movie.thumb_url)} 
                             alt={movie.name} 
+                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} 
                             loading="lazy" 
                           />
                         </div>
                         
-                        <h3>{movie.name}</h3>
-                        <p style={{ color: "#aaaaaa" }}>{movie.origin_name}</p>
+                        <h3 style={{ fontSize: "12px", fontWeight: "600", margin: "8px 0 2px 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#ffffff" }}>{movie.name}</h3>
+                        <p style={{ fontSize: "11px", color: "#aaaaaa", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{movie.origin_name}</p>
                       </div>
                     ))
                   ) : (
@@ -576,7 +537,6 @@ function HomePageContent() {
             )}
           </main>
 
-          {/* SIDEBAR BÊN PHẢI */}
           <aside style={{ minWidth: 0 }}>
             <h2 style={{ fontSize: "14px", color: "#8a3ffc", textTransform: "uppercase", marginBottom: "15px", fontWeight: "700", borderBottom: "1px solid #1a1a1a", paddingBottom: "8px" }}>
               Phim Hot Trong Tuần
@@ -624,7 +584,6 @@ function HomePageContent() {
         </div>
       </div>
 
-      {/* FOOTER */}
       <footer style={{ backgroundColor: "#000000", borderTop: "1px solid #14111f", marginTop: "80px", padding: "45px 0" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "30px", padding: "0 20px" }}>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "40px" }}>
