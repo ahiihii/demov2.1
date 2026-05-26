@@ -168,14 +168,14 @@ function HomePageContent() {
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    // Chèn mã CSS Responsive động cải tiến, triệt tiêu lỗi hở viền và định hình lại cấu trúc Mobile
+    // CHỈ CHỈNH SỬA VÀ TỐI ƯU CHO KHUNG MOBILE TRONG @media, KHÔNG LÀM ẢNH HƯỞNG ĐẾN PC WEB
     const style = document.createElement("style");
     style.innerHTML = `
-      html, body { margin: 0; padding: 0; background-color: #060606; overflow-x: hidden; }
+      html, body { margin: 0; padding: 0; background-color: #060606; }
       .header-desktop-nav { display: flex !important; }
       .header-mobile-toggle { display: none !important; }
       
-      /* Cấu trúc Grid PC */
+      /* Cấu trúc Grid chuẩn cho PC (Giữ nguyên) */
       .movie-grid-chunk { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 15px; margin-bottom: 25px; }
       .movie-grid-chunk.reversed { grid-template-columns: 1fr 1fr 1.25fr; }
       .featured-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
@@ -188,14 +188,14 @@ function HomePageContent() {
         .search-grid { grid-template-columns: repeat(3, 1fr); }
       }
 
-      /* ĐỊNH HÌNH LẠI HOÀN TOÀN TRÊN MOBILE CHỐNG HỞ VIỀN, ÉP CHUẨN LƯỚI ĐỨNG DỌC */
+      /* TÁC ĐỘNG DUY NHẤT TRÊN MOBILE - TUYỆT ĐỐI KHÔNG ẢNH HƯỞNG ĐẾN PC */
       @media (max-width: 768px) {
-        .main-container-box { padding: 80px 10px 25px 10px !important; } /* Sát lề hai bên, tràn viền */
+        .main-container-box { padding: 80px 10px 25px 10px !important; }
         .header-desktop-nav { display: none !important; }
         .header-mobile-toggle { display: block !important; }
-        .mobile-hidden-aside { display: none !important; } /* Ẩn sidebar trên mobile chống đẩy giao diện */
+        .mobile-hidden-aside { display: none !important; }
 
-        /* Ép Slider Đề Cử thành 1 hàng duy nhất vuốt ngang mượt mà */
+        /* Vuốt ngang mượt mà cho Slider đề cử trên mobile */
         .featured-grid {
           display: flex !important;
           overflow-x: auto !important;
@@ -207,7 +207,7 @@ function HomePageContent() {
         .featured-movie-card { flex: 0 0 135px !important; scroll-snap-align: start; }
         .featured-img-box { height: 195px !important; }
 
-        /* Phá bỏ khối so le 1 to 4 nhỏ của PC -> chuyển thành lưới đứng 2 cột đồng đều */
+        /* Thiết lập lưới đứng chuẩn 2 cột đồng đều cho Mobile, triệt tiêu khoảng hở */
         .movie-grid-chunk, .movie-grid-chunk.reversed {
           display: grid !important;
           grid-template-columns: repeat(2, 1fr) !important;
@@ -215,24 +215,27 @@ function HomePageContent() {
           margin-bottom: 12px !important;
         }
 
-        /* Đồng bộ hóa toàn bộ chiều cao và cấu trúc thẻ con bên trong chunk */
-        .big-movie-item, .small-movie-item {
+        /* Hủy bỏ hoàn toàn cấu trúc chiều cao cố định và so le đè của PC trên Mobile */
+        .movie-grid-chunk .big-movie-item, 
+        .movie-grid-chunk .small-movie-item,
+        .movie-grid-chunk.reversed .big-movie-item,
+        .movie-grid-chunk.reversed .small-movie-item {
           grid-row: span 1 !important;
           height: auto !important;
-          display: flex !important;
-          flex-direction: column !important;
+          width: 100% !important;
         }
 
-        /* Hộp bọc ảnh tỷ lệ đứng dọc 4:6 chuẩn cho toàn bộ Mobile */
-        .mobile-poster-aspect {
+        /* Định hình lại hộp bọc ảnh tỷ lệ đứng dọc 4:6 chuẩn chống móp méo */
+        .mobile-aspect-poster {
           position: relative !important;
           width: 100% !important;
           height: 0 !important;
-          padding-top: 145% !important; /* Tạo form đứng dọc 4:6 hoàn hảo không bị méo */
+          padding-top: 145% !important;
           border-radius: 6px !important;
           overflow: hidden !important;
         }
-        .mobile-poster-aspect img {
+        
+        .mobile-aspect-poster img {
           position: absolute !important;
           top: 0 !important;
           left: 0 !important;
@@ -240,13 +243,14 @@ function HomePageContent() {
           height: 100% !important;
           object-fit: cover !important;
         }
-        
-        /* Chuyển tiêu đề xuống dưới ảnh rõ ràng, không đè lên hình gây mất chữ */
+
+        /* Chuyển thanh tiêu đề xuống dưới ảnh trên mobile tránh đè mờ che mất hình */
         .mobile-title-under {
           position: relative !important;
           background: transparent !important;
-          padding: 8px 0 !important;
+          padding: 8px 0 4px 0 !important;
         }
+
         .mobile-title-under h3, .mobile-title-under h4 {
           font-size: 13px !important;
           color: #ffffff !important;
@@ -299,52 +303,53 @@ function HomePageContent() {
     return (
       <div className={`movie-grid-chunk ${isReversed ? "reversed" : ""}`}>
         {isReversed && smallMovies.slice(0, 2).map((movie) => (
-          <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ cursor: "pointer" }}>
-            <div className="mobile-poster-aspect" style={{ position: "relative", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
+          <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ position: "relative", cursor: "pointer", borderRadius: "6px", overflow: "hidden", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
+            <div className="mobile-aspect-poster">
               <img src={getCleanImageUrl(movie.thumb_url || movie.poster_url)} alt={movie.name} loading="lazy" />
-              <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px", zIndex: 5 }}>HD</span>
             </div>
             <div className="mobile-title-under" style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.95))", padding: "12px 10px" }}>
               <h4 style={{ fontSize: "12px", color: "#ffffff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: "600" }}>{movie.name}</h4>
             </div>
+            <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px", zIndex: 10 }}>HD</span>
           </div>
         ))}
 
         {bigMovie && (
-          <div onClick={() => router.push(`/movie/${bigMovie.slug}`)} className="big-movie-item" style={{ gridRow: "span 2", cursor: "pointer" }}>
-            <div className="mobile-poster-aspect" style={{ position: "relative", height: "331px", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
+          <div onClick={() => router.push(`/movie/${bigMovie.slug}`)} className="big-movie-item" style={{ gridRow: "span 2", position: "relative", cursor: "pointer", borderRadius: "6px", overflow: "hidden", height: "331px", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
+            <div className="mobile-aspect-poster">
               <img src={getCleanImageUrl(bigMovie.poster_url || bigMovie.thumb_url)} alt={bigMovie.name} loading="lazy" />
-              <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px", zIndex: 5 }}>HD</span>
             </div>
             <div className="mobile-title-under" style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 65%, transparent 100%)", padding: "18px 15px" }}>
+              <span style={{ backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px" }} className="header-desktop-nav">HD</span>
               <h3 style={{ fontSize: "15px", color: "#ffffff", margin: "8px 0 3px 0", fontWeight: "700", letterSpacing: "0.3px" }}>{bigMovie.name}</h3>
-              <p style={{ fontSize: "12px", color: "#cccccc", margin: 0 }} className="mobile-aside-section">{bigMovie.origin_name}</p>
+              <p style={{ fontSize: "12px", color: "#cccccc", margin: 0 }}>{bigMovie.origin_name}</p>
             </div>
+            <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px", zIndex: 10 }} className="header-mobile-toggle">HD</span>
           </div>
         )}
 
         {!isReversed ? (
           smallMovies.map((movie) => (
-            <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ cursor: "pointer" }}>
-              <div className="mobile-poster-aspect" style={{ position: "relative", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
+            <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ position: "relative", cursor: "pointer", borderRadius: "6px", overflow: "hidden", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
+              <div className="mobile-aspect-poster">
                 <img src={getCleanImageUrl(movie.thumb_url || movie.poster_url)} alt={movie.name} loading="lazy" />
-                <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px", zIndex: 5 }}>HD</span>
               </div>
               <div className="mobile-title-under" style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.95))", padding: "12px 10px" }}>
                 <h4 style={{ fontSize: "12px", color: "#ffffff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: "600" }}>{movie.name}</h4>
               </div>
+              <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px", zIndex: 10 }}>HD</span>
             </div>
           ))
         ) : (
           smallMovies.slice(2, 4).map((movie) => (
-            <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ cursor: "pointer" }}>
-              <div className="mobile-poster-aspect" style={{ position: "relative", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
+            <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ position: "relative", cursor: "pointer", borderRadius: "6px", overflow: "hidden", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
+              <div className="mobile-aspect-poster">
                 <img src={getCleanImageUrl(movie.thumb_url || movie.poster_url)} alt={movie.name} loading="lazy" />
-                <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px", zIndex: 5 }}>HD</span>
               </div>
               <div className="mobile-title-under" style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.95))", padding: "12px 10px" }}>
                 <h4 style={{ fontSize: "12px", color: "#ffffff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: "600" }}>{movie.name}</h4>
               </div>
+              <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px", zIndex: 10 }}>HD</span>
             </div>
           ))
         )}
