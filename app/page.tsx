@@ -486,7 +486,7 @@ function HomePageContent() {
                   {searchMovies.length > 0 ? (
                     searchMovies.map((movie) => (
                       <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} style={{ cursor: "pointer", marginBottom: "15px" }}>
-                        <div style={{ position: "relative", width: "100%", height: "220px", borderRadius: "6px", overflow: "hidden", backgroundColor: "#111", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
+                        <div style={{ position: "relative", width: "100%", height: "220px", borderRadius: "6px", overflow: "hidden", backgroundColor: "#11 LIGHT_THEME", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
                           <img src={getCleanImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
                           <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "8px", fontWeight: "700", padding: "2px 4px", borderRadius: "2px" }}>HD</span>
                         </div>
