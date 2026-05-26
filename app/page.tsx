@@ -169,7 +169,6 @@ function HomePageContent() {
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    // BỔ SUNG CSS MEDIA QUERIES TĨNH ĐỂ KHÔNG BỊ DELAY KHI SERVER RENDER TRÊN VERCEL
     const style = document.createElement("style");
     style.innerHTML = `
       .header-desktop-nav { display: flex !important; }
@@ -178,6 +177,8 @@ function HomePageContent() {
       .movie-grid-chunk.reversed { grid-template-columns: 1fr 1fr 1.25fr; }
       .featured-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
       .main-layout { display: grid; grid-template-columns: 1fr 310px; gap: 30px; }
+      
+      /* Cấu trúc Grid cho trang Tìm kiếm / Nút bấm */
       .search-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
       
       @media (max-width: 1024px) {
@@ -227,29 +228,9 @@ function HomePageContent() {
         .big-movie-item, .small-movie-item {
           grid-row: span 1 !important;
           height: auto !important; 
-          aspect-ratio: 2 / 3 !important;
-        }
-        .big-movie-item img, .small-movie-item img {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: cover !important;
         }
 
-        .big-movie-item h3, .small-movie-item h4 {
-          font-size: 12px !important;
-          font-weight: 600 !important;
-          margin: 0 !important;
-          white-space: nowrap !important;
-          overflow: hidden !important;
-          text-overflow: ellipsis !important;
-          line-height: 1.4 !important;
-        }
-        .big-movie-item p { display: none !important; } 
-        .big-movie-item > div {
-          padding: 10px 8px !important;
-          background: linear-gradient(transparent, rgba(0,0,0,0.95)) !important;
-        }
-
+        /* Responsive Mobile cho trang Lọc/Tìm kiếm */
         .search-grid { 
           display: grid !important;
           grid-template-columns: repeat(2, 1fr) !important; 
@@ -266,10 +247,6 @@ function HomePageContent() {
         .featured-grid::-webkit-scrollbar { display: none; }
         .featured-grid > div {
           flex: 0 0 calc(33.333% - 7px) !important;
-        }
-        .featured-grid > div > div {
-          height: auto !important;
-          aspect-ratio: 2 / 3 !important;
         }
       }
 
@@ -515,12 +492,13 @@ function HomePageContent() {
                     searchMovies.map((movie) => (
                       <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} style={{ cursor: "pointer", marginBottom: "15px" }}>
                         
-                        {/* SỬA CHÍ CHÓC: KHÓA TRỰC TIẾP STYLE TẠI ĐÂY ĐỂ TRÁNH LỖI SSR KHI DEPLOY VERCEL */}
-                        <div style={{ position: "relative", width: "100%", height: "auto", aspectRatio: "2 / 3", borderRadius: "6px", overflow: "hidden", backgroundColor: "#111", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
+                        {/* CHỖ FIX CHÍ MẠNG: Bọc khung cố định tỷ lệ aspect-ratio 2/3 */}
+                        <div style={{ position: "relative", width: "100%", aspectRatio: "2 / 3", borderRadius: "6px", overflow: "hidden", backgroundColor: "#111", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
                           <img 
                             src={getCleanImageUrl(movie.poster_url || movie.thumb_url)} 
                             alt={movie.name} 
-                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} 
+                            /* Khóa chiều cao 100% bằng absolute bao khít div bọc để triệt tiêu lỗi phình ảnh trên Vercel */
+                            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} 
                             loading="lazy" 
                           />
                         </div>
