@@ -164,7 +164,7 @@ function HomePageContent() {
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    // HỆ THỐNG GHI ĐÈ CSS ĐỘC LẬP TỐI ƯU BỐ CỤC MOBILE THEO MOTCHILL - GIỮ NGUYÊN PC
+    // HỆ THỐNG FIX CỨNG CHIỀU CAO - GIỮ NGUYÊN HOÀN TOÀN PC
     const style = document.createElement("style");
     style.innerHTML = `
       .header-desktop-nav { display: flex !important; }
@@ -182,24 +182,20 @@ function HomePageContent() {
       }
 
       @media (max-width: 768px) {
-        /* Ẩn các thành phần thừa trên PC */
         .header-desktop-nav { display: none !important; }
         
-        /* Cải đặt lại Header mờ nhẹ chuẩn Motchill */
         header {
-          background-color: rgba(0, 0, 0, 0.85) !important;
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          background-color: rgba(0, 0, 0, 0.9) !important;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           padding: 10px 15px !important;
           height: 60px !important;
         }
 
-        /* Đẩy nội dung trang xuống tránh bị Header đè */
         .main-content-wrapper {
           padding-top: 75px !important;
         }
 
-        /* Hiện ô tìm kiếm bo tròn ôm sát tinh tế dưới Header */
         .mobile-search-wrapper {
           display: flex !important;
           margin-bottom: 15px;
@@ -216,39 +212,43 @@ function HomePageContent() {
           outline: none;
         }
 
-        /* ÉP PHẲNG HOÀN TOÀN cấu trúc đan xen phức tạp thành lưới 2 cột thẳng hàng đều tăm tắp */
+        /* ÉP LƯỚI 2 CỘT PHẲNG NHAU TUYỆT ĐỐI */
         .movie-grid-chunk, .movie-grid-chunk.reversed {
           display: grid !important;
           grid-template-columns: repeat(2, 1fr) !important;
-          gap: 10px !important;
+          gap: 12px !important;
           margin-bottom: 15px !important;
         }
 
-        /* Đưa toàn bộ ảnh phim (Cả Big và Small) về chung 1 tỷ lệ đứng dọc, không móp méo */
+        /* FIX LỖI CAO THẤP: Khóa cứng tỷ lệ poster đứng 2:3, bỏ hẳn height gán cứng px từ PC */
         .big-movie-item, .small-movie-item {
           grid-row: span 1 !important;
-          height: 240px !important;
+          height: auto !important; 
+          aspect-ratio: 2 / 3 !important;
           box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
         }
 
-        /* Chuẩn hóa thông tin text trong thẻ phim trên Mobile giống nhau */
+        /* Chuẩn hóa font chữ tiêu đề phim đồng đều */
         .big-movie-item h3, .small-movie-item h4 {
           font-size: 12px !important;
           font-weight: 600 !important;
-          margin: 4px 0 0 0 !important;
+          margin: 0 !important;
           white-space: nowrap !important;
           overflow: hidden !important;
           text-overflow: ellipsis !important;
+          line-height: 1.4 !important;
         }
-        .big-movie-item p { display: none !important; } /* Ẩn text phụ đề dài dòng */
         
-        /* Chỉnh lại gradient phủ nền chữ text của ảnh to cho đồng bộ ảnh nhỏ */
+        /* Ẩn subtitle dài dòng tránh đẩy giao diện */
+        .big-movie-item p { display: none !important; } 
+        
+        /* Đồng bộ vùng chứa text mờ nhẹ ở đáy ảnh */
         .big-movie-item > div {
-          padding: 12px 10px !important;
+          padding: 10px 8px !important;
           background: linear-gradient(transparent, rgba(0,0,0,0.95)) !important;
         }
 
-        /* Phần phim đề cử chuyển thành hàng ngang cuộn (Scroll) mượt mà */
+        /* Slider đề cử hàng ngang cuộn tròn trịa */
         .featured-grid {
           display: flex !important;
           overflow-x: auto !important;
@@ -261,17 +261,17 @@ function HomePageContent() {
           flex: 0 0 calc(33.333% - 7px) !important;
         }
         .featured-grid > div > div {
-          height: 140px !important;
+          height: auto !important;
+          aspect-ratio: 2 / 3 !important;
         }
 
-        /* Lưới trang tìm kiếm/lọc phim phân tách 2 cột */
-        .search-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-        .search-movie-image-holder { height: 240px !important; }
+        /* Grid trang tìm kiếm chuẩn 2 cột */
+        .search-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+        .search-movie-image-holder { height: auto !important; aspect-ratio: 2 / 3 !important; }
       }
 
       @media (max-width: 480px) {
-        .featured-grid > div { flex: 0 0 calc(38% - 7px) !important; }
-        .big-movie-item, .small-movie-item, .search-movie-image-holder { height: 215px !important; }
+        .featured-grid > div { flex: 0 0 calc(36% - 7px) !important; }
       }
     `;
     document.head.appendChild(style);
@@ -302,7 +302,7 @@ function HomePageContent() {
     );
   }
 
-  // GIỮ NGUYÊN HOÀN TOÀN LOGIC THUẬT TOÁN MAP CHUNK PHIM GỐC GẦN 100 DÒNG CỦA BẠN
+  // GIỮ NGUYÊN VẸN TOÀN BỘ LOGIC RENDER PHIM GỐC CỦA BẠN
   const renderMovieChunk = (moviesList: Movie[], startIndex: number, isReversed: boolean) => {
     const chunk = moviesList.slice(startIndex, startIndex + 5);
     if (chunk.length === 0) return null;
@@ -431,7 +431,7 @@ function HomePageContent() {
             <span style={{ color: "#ffffff", fontSize: "13px", cursor: "pointer", fontWeight: "500", whiteSpace: "nowrap" }}>👤 Đăng nhập</span>
           </div>
 
-          {/* Nút quay lại trang chủ nhanh trên mobile góc phải header */}
+          {/* Nút trang chủ Mobile góc phải Header */}
           <div style={{ display: "none", cursor: "pointer", fontSize: "18px" }} className="mobile-search-wrapper" onClick={handleGoHome}>
             🏠
           </div>
@@ -439,21 +439,21 @@ function HomePageContent() {
         </div>
       </header>
 
-      {/* KHUNG WRAPPER CHỨA NỘI DUNG */}
+      {/* KHUNG NỘI DUNG */}
       <div className="main-content-wrapper" style={{ maxWidth: "1280px", margin: "0 auto", padding: "85px 15px 25px 15px" }}>
         
-        {/* Ô TÌM KIẾM CHO MOBILE (TỰ ĐỘNG BẬT QUA CSS OVERRIDE PHÍA TRÊN) */}
+        {/* Ô TÌM KIẾM MOBILE ĐỘC LẬP */}
         <div className="mobile-search-wrapper">
           <input 
             type="text" 
-            placeholder="Tìm kiếm phim..." 
+            placeholder="Tìm kiếm phim tại Meephim..." 
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
             onKeyDown={handleSearch}
           />
         </div>
 
-        {/* SLIDER ĐỀ CỬ BANNER CHUẨN GỐC */}
+        {/* BANNER ĐỀ CỬ */}
         {isHome && featuredMovies.length > 0 && (
           <section style={{ marginBottom: "30px" }} className="featured-section-box">
             <h2 style={{ fontSize: "15px", color: "#ffffff", textTransform: "uppercase", borderLeft: "3px solid #8a3ffc", paddingLeft: "10px", marginBottom: "15px", fontWeight: "700", letterSpacing: "0.5px" }}>
@@ -472,7 +472,7 @@ function HomePageContent() {
           </section>
         )}
 
-        {/* BỐ CỤC CHÍNH HAI CỘT GỐC */}
+        {/* LAYOUT GỐC 2 CỘT */}
         <div className="main-layout">
           
           <main style={{ minWidth: 0 }}>
@@ -532,7 +532,7 @@ function HomePageContent() {
             )}
           </main>
 
-          {/* SIDEBAR BÊN PHẢI GỐC CHUẨN ĐỦ DÒNG */}
+          {/* SIDEBAR HOT TRACKING */}
           <aside style={{ minWidth: 0 }}>
             <h2 style={{ fontSize: "14px", color: "#8a3ffc", textTransform: "uppercase", marginBottom: "15px", fontWeight: "700", borderBottom: "1px solid #1a1a1a", paddingBottom: "8px" }}>
               Phim Hot Trong Tuần
@@ -580,7 +580,7 @@ function HomePageContent() {
         </div>
       </div>
 
-      {/* FOOTER GỐC CHUẨN ĐỦ DÒNG */}
+      {/* FOOTER */}
       <footer style={{ backgroundColor: "#000000", borderTop: "1px solid #14111f", marginTop: "80px", padding: "45px 0" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "30px", padding: "0 20px" }}>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "40px" }}>
