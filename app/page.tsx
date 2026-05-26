@@ -48,6 +48,9 @@ function HomePageContent() {
   const years = ["2026", "2025", "2024", "2023", "2022"];
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
+  // Thêm State ẩn/hiện menu 3 gạch trên bản Mobile giống Motchill
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const getCleanImageUrl = (url: string) => {
     if (!url) return "https://placehold.co/300x450/000/fff?text=No+Image";
     if (url.includes("phimimg.com")) {
@@ -108,6 +111,7 @@ function HomePageContent() {
   const handleRoutingFilters = async () => {
     setLoading(true);
     setActiveMenu(null);
+    setIsMobileMenuOpen(false); // Tự động đóng menu khi chuyển mục phim
     let apiUrl = "";
     let pageTitle = "";
 
@@ -173,12 +177,14 @@ function HomePageContent() {
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchKeyword.trim() !== "") {
       router.push(`/?search=${encodeURIComponent(searchKeyword.trim())}`);
+      setIsMobileMenuOpen(false);
     }
   };
 
   const handleGoHome = () => {
     setSearchKeyword("");
     router.push("/");
+    setIsMobileMenuOpen(false);
   };
 
   if (loading && moviesUpdated.length === 0) {
@@ -269,14 +275,15 @@ function HomePageContent() {
             </div>
           </div>
           
-          <nav className="nav-menu" style={{ display: "flex", gap: "20px", fontSize: "13px", fontWeight: "600", color: "#b3b3b3" }}>
+          {/* Menu chính định dạng class cho mobile ẩn đi gom vào 3 gạch */}
+          <nav className={`nav-menu ${isMobileMenuOpen ? "mobile-open" : ""}`} style={{ display: "flex", gap: "20px", fontSize: "13px", fontWeight: "600", color: "#b3b3b3" }}>
             <span onClick={() => router.push("/?type=phim-le")} style={{ cursor: "pointer", color: typeParam === "phim-le" ? "#8a3ffc" : "#b3b3b3" }}>Phim Lẻ</span>
             <span onClick={() => router.push("/?type=phim-bo")} style={{ cursor: "pointer", color: typeParam === "phim-bo" ? "#8a3ffc" : "#b3b3b3" }}>Phim Bộ</span>
             
             <div style={{ position: "relative" }}>
               <span onClick={() => setActiveMenu(activeMenu === "genre" ? null : "genre")} style={{ cursor: "pointer", color: genreParam ? "#8a3ffc" : "#b3b3b3", display: "block" }}>Thể Loại ▾</span>
-              {activeMenu === "genre" && (
-                <div style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "160px", display: "grid", gridTemplateColumns: "1fr", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
+              {(activeMenu === "genre" || isMobileMenuOpen) && (
+                <div className="dropdown-sub-menu" style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "160px", display: "grid", gridTemplateColumns: "1fr", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
                   {genres.map((g) => (
                     <span key={g._id} onClick={() => router.push(`/?genre=${g.slug}`)} style={{ cursor: "pointer", color: genreParam === g.slug ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px", borderRadius: "2px" }} onMouseEnter={(e) => e.currentTarget.style.color = "#8a3ffc"} onMouseLeave={(e) => e.currentTarget.style.color = genreParam === g.slug ? "#8a3ffc" : "#cccccc"}>{g.name}</span>
                   ))}
@@ -286,8 +293,8 @@ function HomePageContent() {
 
             <div style={{ position: "relative" }}>
               <span onClick={() => setActiveMenu(activeMenu === "country" ? null : "country")} style={{ cursor: "pointer", color: countryParam ? "#8a3ffc" : "#b3b3b3", display: "block" }}>Quốc Gia ▾</span>
-              {activeMenu === "country" && (
-                <div style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "160px", display: "grid", gridTemplateColumns: "1fr", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
+              {(activeMenu === "country" || isMobileMenuOpen) && (
+                <div className="dropdown-sub-menu" style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "160px", display: "grid", gridTemplateColumns: "1fr", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
                   {countries.map((c) => (
                     <span key={c._id} onClick={() => router.push(`/?country=${c.slug}`)} style={{ cursor: "pointer", color: countryParam === c.slug ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px", borderRadius: "2px" }} onMouseEnter={(e) => e.currentTarget.style.color = "#8a3ffc"} onMouseLeave={(e) => e.currentTarget.style.color = countryParam === c.slug ? "#8a3ffc" : "#cccccc"}>{c.name}</span>
                   ))}
@@ -297,8 +304,8 @@ function HomePageContent() {
 
             <div style={{ position: "relative" }}>
               <span onClick={() => setActiveMenu(activeMenu === "year" ? null : "year")} style={{ cursor: "pointer", color: yearParam ? "#8a3ffc" : "#b3b3b3", display: "block" }}>Năm ▾</span>
-              {activeMenu === "year" && (
-                <div style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "110px", display: "flex", flexDirection: "column", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
+              {(activeMenu === "year" || isMobileMenuOpen) && (
+                <div className="dropdown-sub-menu dropdown-year-menu" style={{ position: "absolute", top: "25px", left: 0, backgroundColor: "#0f0f0f", border: "1px solid #222", padding: "10px", borderRadius: "4px", width: "110px", display: "flex", flexDirection: "column", gap: "8px", zIndex: 110, boxShadow: "0 10px 25px rgba(0,0,0,0.7)" }}>
                   {years.map((y) => (
                     <span key={y} onClick={() => router.push(`/?year=${y}`)} style={{ cursor: "pointer", color: yearParam === y ? "#8a3ffc" : "#cccccc", fontSize: "13px", padding: "2px 4px" }} onMouseEnter={(e) => e.currentTarget.style.color = "#8a3ffc"} onMouseLeave={(e) => e.currentTarget.style.color = yearParam === y ? "#8a3ffc" : "#cccccc"}>Năm {y}</span>
                   ))}
@@ -321,6 +328,15 @@ function HomePageContent() {
             style={{ backgroundColor: "#141414", border: "1px solid #251e36", color: "#ffffff", padding: "8px 18px", borderRadius: "20px", fontSize: "12px", width: "220px", outline: "none" }}
           />
           <span className="login-btn" style={{ color: "#ffffff", fontSize: "13px", cursor: "pointer", fontWeight: "500" }}>👤 Đăng nhập</span>
+          
+          {/* NÚT BẤM 3 GẠCH TRÊN MOBILE */}
+          <button 
+            className="mobile-hamburger-btn" 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            style={{ display: "none", background: "none", border: "none", color: "#ffffff", fontSize: "24px", cursor: "pointer", outline: "none", padding: "0 5px" }}
+          >
+            {isMobileMenuOpen ? "✕" : "☰"}
+          </button>
         </div>
       </header>
 
@@ -407,8 +423,9 @@ function HomePageContent() {
             )}
           </main>
 
-          {/* SIDEBAR BÊN PHẢI */}
+          {/* SIDEBAR BÊN PHẢI (GIỮ NGUYÊN VẸN CẢ 2 PHẦN) */}
           <aside className="sidebar-hot-content">
+            {/* 1. Phần Phim Hot Trong Tuần */}
             <h2 style={{ fontSize: "14px", color: "#8a3ffc", textTransform: "uppercase", marginBottom: "15px", fontWeight: "700", borderBottom: "1px solid #1a1a1a", paddingBottom: "8px" }}>
               Phim Hot Trong Tuần
             </h2>
@@ -429,6 +446,7 @@ function HomePageContent() {
               ))}
             </div>
 
+            {/* 2. Phần Đánh giá cao (Khôi phục lại đầy đủ) */}
             <h2 style={{ fontSize: "14px", color: "#8a3ffc", textTransform: "uppercase", marginBottom: "15px", fontWeight: "700", borderBottom: "1px solid #1a1a1a", paddingBottom: "8px" }}>
               Đánh giá cao
             </h2>
@@ -455,7 +473,7 @@ function HomePageContent() {
         </div>
       </div>
 
-      {/* FOOTER */}
+      {/* FOOTER (Khôi phục lại đầy đủ) */}
       <footer className="main-footer" style={{ backgroundColor: "#000000", borderTop: "1px solid #14111f", marginTop: "80px", padding: "45px 0" }}>
         <div className="footer-container" style={{ maxWidth: "1240px", margin: "0 auto", display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "60px", padding: "0 20px" }}>
           <div>
