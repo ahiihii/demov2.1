@@ -168,7 +168,7 @@ function HomePageContent() {
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    // Chèn mã CSS Responsive tối ưu hóa giao diện di động chuẩn xác theo phong cách Motchill
+    // Chèn mã CSS Responsive động trực tiếp vào Header để tối ưu thiết bị di động
     const style = document.createElement("style");
     style.innerHTML = `
       .header-desktop-nav { display: flex !important; }
@@ -181,59 +181,29 @@ function HomePageContent() {
       
       @media (max-width: 1024px) {
         .main-layout { grid-template-columns: 1fr; }
-        .featured-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+        .featured-grid { grid-template-columns: repeat(4, 1fr); }
         .search-grid { grid-template-columns: repeat(3, 1fr); }
       }
 
       @media (max-width: 768px) {
         .header-desktop-nav { display: none !important; }
         .header-mobile-toggle { display: block !important; }
+        .featured-grid { grid-template-columns: repeat(3, 1fr); }
         
-        /* Chuyển Đề Cử thành thanh cuộn ngang mượt mà (Horizontal Slider) giống Motchill */
-        .featured-grid { 
-          display: flex !important; 
-          overflow-x: auto !important; 
-          gap: 12px !important; 
-          padding-bottom: 10px !important;
-          scroll-snap-type: x mandatory;
-          -webkit-overflow-scrolling: touch;
-        }
-        .featured-grid::-webkit-scrollbar {
-          height: 4px;
-        }
-        .featured-grid::-webkit-scrollbar-thumb {
-          background-color: #333;
-          border-radius: 4px;
-        }
-        .featured-item-box {
-          flex: 0 0 calc(33.333% - 8px) !important;
-          scroll-snap-align: start;
-        }
-
-        /* Chuyển đổi Chunk hỗn hợp sang Grid 2 cột đồng bộ cực đẹp trên mobile */
-        .movie-grid-chunk, .movie-grid-chunk.reversed { 
-          display: grid !important; 
-          grid-template-columns: repeat(2, 1fr) !important; 
-          gap: 12px !important; 
-          margin-bottom: 20px !important;
-        }
-        
-        /* Đồng nhất chiều cao poster trên mobile tránh bị lệch hàng lệch lối */
-        .big-movie-item, .small-movie-item { 
-          grid-row: span 1 !important; 
-          height: 230px !important; 
-        }
-        
+        /* FIX LỖI TRANG TÌM KIẾM/BỘ LỌC TRÊN MOBILE */
         .search-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+        .search-movie-card { margin-bottom: 10px !important; }
+        .search-movie-image-wrapper { height: 240px !important; } /* Tăng chiều cao ảnh dọc giống Motchill để không bị lùn bẹt */
+        
+        .movie-grid-chunk, .movie-grid-chunk.reversed { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+        .big-movie-item { grid-row: span 1 !important; height: 185px !important; }
+        .small-movie-item { height: 185px !important; }
       }
 
       @media (max-width: 480px) {
-        .featured-item-box {
-          flex: 0 0 calc(38% - 8px) !important;
-        }
-        .big-movie-item, .small-movie-item { 
-          height: 210px !important; 
-        }
+        .featured-grid { grid-template-columns: repeat(2, 1fr); }
+        /* Mobile nhỏ hơn, hạ chiều cao khung ảnh một chút để vừa vặn màn hình */
+        .search-movie-image-wrapper { height: 210px !important; }
       }
     `;
     document.head.appendChild(style);
@@ -278,18 +248,18 @@ function HomePageContent() {
         {isReversed && smallMovies.slice(0, 2).map((movie) => (
           <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ position: "relative", cursor: "pointer", borderRadius: "6px", overflow: "hidden", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
             <img src={getCleanImageUrl(movie.thumb_url || movie.poster_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
-            <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "rgba(0,0,0,0.75)", color: "#00f5d4", fontSize: "10px", fontWeight: "700", padding: "3px 6px", borderRadius: "3px", zIndex: 10, border: "1px solid rgba(255,255,255,0.1)" }}>HD</span>
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.95))", padding: "12px 10px" }}>
               <h4 style={{ fontSize: "12px", color: "#ffffff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: "600" }}>{movie.name}</h4>
             </div>
+            <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px" }}>HD</span>
           </div>
         ))}
 
         {bigMovie && (
           <div onClick={() => router.push(`/movie/${bigMovie.slug}`)} className="big-movie-item" style={{ gridRow: "span 2", position: "relative", cursor: "pointer", borderRadius: "6px", overflow: "hidden", height: "331px", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
             <img src={getCleanImageUrl(bigMovie.poster_url || bigMovie.thumb_url)} alt={bigMovie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
-            <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "rgba(0,0,0,0.75)", color: "#00f5d4", fontSize: "10px", fontWeight: "700", padding: "3px 6px", borderRadius: "3px", zIndex: 10, border: "1px solid rgba(255,255,255,0.1)" }}>HD</span>
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 65%, transparent 100%)", padding: "18px 15px" }}>
+              <span style={{ backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px" }}>HD</span>
               <h3 style={{ fontSize: "15px", color: "#ffffff", margin: "8px 0 3px 0", fontWeight: "700", letterSpacing: "0.3px" }}>{bigMovie.name}</h3>
               <p style={{ fontSize: "12px", color: "#cccccc", margin: 0 }}>{bigMovie.origin_name}</p>
             </div>
@@ -300,20 +270,20 @@ function HomePageContent() {
           smallMovies.map((movie) => (
             <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ position: "relative", cursor: "pointer", borderRadius: "6px", overflow: "hidden", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
               <img src={getCleanImageUrl(movie.thumb_url || movie.poster_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
-              <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "rgba(0,0,0,0.75)", color: "#00f5d4", fontSize: "10px", fontWeight: "700", padding: "3px 6px", borderRadius: "3px", zIndex: 10, border: "1px solid rgba(255,255,255,0.1)" }}>HD</span>
               <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.95))", padding: "12px 10px" }}>
                 <h4 style={{ fontSize: "12px", color: "#ffffff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: "600" }}>{movie.name}</h4>
               </div>
+              <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px" }}>HD</span>
             </div>
           ))
         ) : (
           smallMovies.slice(2, 4).map((movie) => (
             <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="small-movie-item" style={{ position: "relative", cursor: "pointer", borderRadius: "6px", overflow: "hidden", height: "158px", backgroundColor: "#111", boxShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>
               <img src={getCleanImageUrl(movie.thumb_url || movie.poster_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
-              <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "rgba(0,0,0,0.75)", color: "#00f5d4", fontSize: "10px", fontWeight: "700", padding: "3px 6px", borderRadius: "3px", zIndex: 10, border: "1px solid rgba(255,255,255,0.1)" }}>HD</span>
               <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.95))", padding: "12px 10px" }}>
                 <h4 style={{ fontSize: "12px", color: "#ffffff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontWeight: "600" }}>{movie.name}</h4>
               </div>
+              <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "9px", fontWeight: "700", padding: "2px 5px", borderRadius: "3px" }}>HD</span>
             </div>
           ))
         )}
@@ -467,10 +437,10 @@ function HomePageContent() {
             </h2>
             <div className="featured-grid">
               {featuredMovies.slice(0, 8).map((movie) => (
-                <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="featured-item-box" style={{ cursor: "pointer" }}>
+                <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} style={{ cursor: "pointer" }}>
                   <div style={{ position: "relative", width: "100%", height: "165px", borderRadius: "5px", overflow: "hidden", backgroundColor: "#111111" }}>
                     <img src={getCleanImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
-                    <span style={{ position: "absolute", top: "6px", left: "6px", backgroundColor: "rgba(0,0,0,0.75)", color: "#00f5d4", fontSize: "9px", padding: "2px 5px", borderRadius: "3px", fontWeight: "600" }}>{movie.episode_current || "Bản Đẹp"}</span>
+                    <span style={{ position: "absolute", bottom: "6px", left: "6px", backgroundColor: "rgba(0,0,0,0.85)", color: "#00f5d4", fontSize: "9px", padding: "2px 5px", borderRadius: "3px", fontWeight: "600" }}>{movie.episode_current || "Bản Đẹp"}</span>
                   </div>
                   <h3 style={{ fontSize: "12px", margin: "6px 0 2px 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#ffffff", fontWeight: "600" }}>{movie.name}</h3>
                 </div>
@@ -522,12 +492,16 @@ function HomePageContent() {
                 <div className="search-grid">
                   {searchMovies.length > 0 ? (
                     searchMovies.map((movie) => (
-                      <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} style={{ cursor: "pointer", marginBottom: "15px" }}>
-                        <div style={{ position: "relative", width: "100%", height: "220px", borderRadius: "6px", overflow: "hidden", backgroundColor: "#11 LIGHT_THEME", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
+                      <div key={movie._id} onClick={() => router.push(`/movie/${movie.slug}`)} className="search-movie-card" style={{ cursor: "pointer", marginBottom: "20px" }}>
+                        {/* Thay thế style inline tĩnh bằng class động được định nghĩa ở thẻ <style> phía trên */}
+                        <div className="search-movie-image-wrapper" style={{ position: "relative", width: "100%", height: "290px", borderRadius: "6px", overflow: "hidden", backgroundColor: "#111", boxShadow: "0 4px 10px rgba(0,0,0,0.5)" }}>
                           <img src={getCleanImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
-                          <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "rgba(0,0,0,0.75)", color: "#00f5d4", fontSize: "10px", fontWeight: "700", padding: "3px 6px", borderRadius: "3px" }}>HD</span>
+                          <span style={{ position: "absolute", top: "8px", left: "8px", backgroundColor: "#00f5d4", color: "#000000", fontSize: "8px", fontWeight: "700", padding: "2px 4px", borderRadius: "2px" }}>HD</span>
+                          {movie.episode_current && (
+                            <span style={{ position: "absolute", bottom: "8px", left: "8px", backgroundColor: "rgba(0,0,0,0.75)", color: "#ffffff", fontSize: "10px", padding: "2px 6px", borderRadius: "3px" }}>{movie.episode_current}</span>
+                          )}
                         </div>
-                        <h3 style={{ fontSize: "12px", fontWeight: "600", margin: "8px 0 2px 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#ffffff" }}>{movie.name}</h3>
+                        <h3 style={{ fontSize: "13px", fontWeight: "600", margin: "8px 0 2px 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#ffffff" }}>{movie.name}</h3>
                         <p style={{ fontSize: "12px", color: "#aaaaaa", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{movie.origin_name}</p>
                       </div>
                     ))
@@ -550,7 +524,7 @@ function HomePageContent() {
                   <span style={{ width: "22px", height: "22px", backgroundColor: index < 3 ? "#8a3ffc" : "#222222", color: index < 3 ? "#ffffff" : "#aaa", borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", fontSize: "11px", fontWeight: "700", marginRight: "15px", flexShrink: 0 }}>
                     {index + 1}
                   </span>
-                  <div style={{ width: "35px", height: "45px", borderRadius: "4px", overflow: "hidden", marginRight: "12px", backgroundColor: "#111", flexShrink: 0 }}>
+                  <div style={{ width: "35px", height: "45px", borderRadius: "4px", overflow: "hidden", marginRight: "12px", backgroundColor: "#11_LIGHT_THEME", flexShrink: 0 }}>
                     <img src={getCleanImageUrl(movie.thumb_url || movie.poster_url)} alt={movie.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
                   </div>
                   <div style={{ flexGrow: 1, minWidth: 0 }}>
