@@ -164,7 +164,7 @@ function HomePageContent() {
     link.rel = "stylesheet";
     document.head.appendChild(link);
 
-    // HỆ THỐNG FIX CỨNG CHIỀU CAO - GIỮ NGUYÊN HOÀN TOÀN PC
+    // HỆ THỐNG GHI ĐÈ CSS ĐỘC LẬP - KHÓA TỶ LỆ ẢNH TUYỆT ĐỐI CHO TRANG TÌM KIẾM
     const style = document.createElement("style");
     style.innerHTML = `
       .header-desktop-nav { display: flex !important; }
@@ -212,7 +212,7 @@ function HomePageContent() {
           outline: none;
         }
 
-        /* ÉP LƯỚI 2 CỘT PHẲNG NHAU TUYỆT ĐỐI */
+        /* TRANG CHỦ: ÉP PHẲNG 2 CỘT */
         .movie-grid-chunk, .movie-grid-chunk.reversed {
           display: grid !important;
           grid-template-columns: repeat(2, 1fr) !important;
@@ -220,15 +220,18 @@ function HomePageContent() {
           margin-bottom: 15px !important;
         }
 
-        /* FIX LỖI CAO THẤP: Khóa cứng tỷ lệ poster đứng 2:3, bỏ hẳn height gán cứng px từ PC */
+        /* ÉP CHẾT TỶ LỆ KHUNG POSTER TRANG CHỦ */
         .big-movie-item, .small-movie-item {
           grid-row: span 1 !important;
           height: auto !important; 
           aspect-ratio: 2 / 3 !important;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+        }
+        .big-movie-item img, .small-movie-item img {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
         }
 
-        /* Chuẩn hóa font chữ tiêu đề phim đồng đều */
         .big-movie-item h3, .small-movie-item h4 {
           font-size: 12px !important;
           font-weight: 600 !important;
@@ -238,14 +241,48 @@ function HomePageContent() {
           text-overflow: ellipsis !important;
           line-height: 1.4 !important;
         }
-        
-        /* Ẩn subtitle dài dòng tránh đẩy giao diện */
         .big-movie-item p { display: none !important; } 
-        
-        /* Đồng bộ vùng chứa text mờ nhẹ ở đáy ảnh */
         .big-movie-item > div {
           padding: 10px 8px !important;
           background: linear-gradient(transparent, rgba(0,0,0,0.95)) !important;
+        }
+
+        /* TRANG TÌM KIẾM & LỌC PHIM: SỬA TRIỆT ĐỂ LỖI DÀI NGẮN THEO MOTCHILL */
+        .search-grid { 
+          display: grid !important;
+          grid-template-columns: repeat(2, 1fr) !important; 
+          gap: 12px !important; 
+        }
+        
+        /* Khóa cứng khung bọc ảnh tìm kiếm tỷ lệ đứng 2:3 giống trang chủ */
+        .search-movie-image-holder { 
+          height: auto !important; 
+          aspect-ratio: 2 / 3 !important; 
+          width: 100% !important;
+        }
+        
+        /* Ép ảnh bên trong lấp đầy khung, không cho tự co giãn theo ảnh gốc API */
+        .search-movie-image-holder img {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
+        }
+
+        /* Tinh chỉnh chữ text phần tìm kiếm cho ngay ngắn */
+        .search-grid h3 {
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          margin: 6px 0 2px 0 !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+        .search-grid p {
+          font-size: 11px !important;
+          margin: 0 !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
         }
 
         /* Slider đề cử hàng ngang cuộn tròn trịa */
@@ -264,10 +301,6 @@ function HomePageContent() {
           height: auto !important;
           aspect-ratio: 2 / 3 !important;
         }
-
-        /* Grid trang tìm kiếm chuẩn 2 cột */
-        .search-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
-        .search-movie-image-holder { height: auto !important; aspect-ratio: 2 / 3 !important; }
       }
 
       @media (max-width: 480px) {
@@ -302,7 +335,7 @@ function HomePageContent() {
     );
   }
 
-  // GIỮ NGUYÊN VẸN TOÀN BỘ LOGIC RENDER PHIM GỐC CỦA BẠN
+  // LOGIC THUẬT TOÁN PHÂN TÁCH MAPPED CHUNK PHIM GỐC CỦA BẠN (GIỮ NGUYÊN)
   const renderMovieChunk = (moviesList: Movie[], startIndex: number, isReversed: boolean) => {
     const chunk = moviesList.slice(startIndex, startIndex + 5);
     if (chunk.length === 0) return null;
@@ -431,7 +464,7 @@ function HomePageContent() {
             <span style={{ color: "#ffffff", fontSize: "13px", cursor: "pointer", fontWeight: "500", whiteSpace: "nowrap" }}>👤 Đăng nhập</span>
           </div>
 
-          {/* Nút trang chủ Mobile góc phải Header */}
+          {/* Nút quay lại trang chủ nhanh trên Mobile */}
           <div style={{ display: "none", cursor: "pointer", fontSize: "18px" }} className="mobile-search-wrapper" onClick={handleGoHome}>
             🏠
           </div>
@@ -439,10 +472,10 @@ function HomePageContent() {
         </div>
       </header>
 
-      {/* KHUNG NỘI DUNG */}
+      {/* KHUNG WRAPPER CHỨA NỘI DUNG CHÍNH */}
       <div className="main-content-wrapper" style={{ maxWidth: "1280px", margin: "0 auto", padding: "85px 15px 25px 15px" }}>
         
-        {/* Ô TÌM KIẾM MOBILE ĐỘC LẬP */}
+        {/* Ô TÌM KIẾM CHO MOBILE */}
         <div className="mobile-search-wrapper">
           <input 
             type="text" 
@@ -453,7 +486,7 @@ function HomePageContent() {
           />
         </div>
 
-        {/* BANNER ĐỀ CỬ */}
+        {/* SLIDER BANNER ĐỀ CỬ */}
         {isHome && featuredMovies.length > 0 && (
           <section style={{ marginBottom: "30px" }} className="featured-section-box">
             <h2 style={{ fontSize: "15px", color: "#ffffff", textTransform: "uppercase", borderLeft: "3px solid #8a3ffc", paddingLeft: "10px", marginBottom: "15px", fontWeight: "700", letterSpacing: "0.5px" }}>
@@ -472,7 +505,7 @@ function HomePageContent() {
           </section>
         )}
 
-        {/* LAYOUT GỐC 2 CỘT */}
+        {/* BỐ CỤC CHÍNH HAI CỘT GỐC */}
         <div className="main-layout">
           
           <main style={{ minWidth: 0 }}>
@@ -532,7 +565,7 @@ function HomePageContent() {
             )}
           </main>
 
-          {/* SIDEBAR HOT TRACKING */}
+          {/* SIDEBAR BÊN PHẢI GỐC */}
           <aside style={{ minWidth: 0 }}>
             <h2 style={{ fontSize: "14px", color: "#8a3ffc", textTransform: "uppercase", marginBottom: "15px", fontWeight: "700", borderBottom: "1px solid #1a1a1a", paddingBottom: "8px" }}>
               Phim Hot Trong Tuần
@@ -580,7 +613,7 @@ function HomePageContent() {
         </div>
       </div>
 
-      {/* FOOTER */}
+      {/* FOOTER GỐC */}
       <footer style={{ backgroundColor: "#000000", borderTop: "1px solid #14111f", marginTop: "80px", padding: "45px 0" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "30px", padding: "0 20px" }}>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "40px" }}>
